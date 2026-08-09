@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周报"注水"净化器 · 从流水账到价值叙事</title>
+<style>
+  :root{
+    --primary:#4f46e5; --primary-light:#eef2ff; --primary-dark:#3730a3;
+    --green:#059669; --amber:#d97706; --rose:#e11d48; --sky:#0284c7;
+    --bg:#f6f7fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+    --border:#e5e7eb; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+  .container{max-width:1080px;margin:0 auto;padding:24px 20px 60px}
+
+  /* Header */
+  header{background:linear-gradient(120deg,#4f46e5 0%,#7c3aed 55%,#2563eb 100%);color:#fff;border-radius:var(--radius);padding:34px 32px;margin-bottom:22px;position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08)}
+  header h1{font-size:26px;letter-spacing:1px}
+  header p{margin-top:8px;opacity:.92;font-size:14px}
+  .badge{display:inline-block;margin-top:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:3px 12px;border-radius:99px;font-size:12px}
+
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card h2{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card h2 .num{background:var(--primary);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+
+  textarea{width:100%;min-height:180px;border:1.5px solid var(--border);border-radius:10px;padding:14px;font-size:14px;font-family:inherit;resize:vertical;outline:none;transition:.2s}
+  textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+
+  .btn-row{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;align-items:center}
+  button{border:none;border-radius:10px;padding:11px 22px;font-size:14px;cursor:pointer;font-family:inherit;transition:.15s}
+  button:active{transform:scale(.97)}
+  .btn-primary{background:linear-gradient(100deg,var(--primary),#7c3aed);color:#fff;font-weight:600;box-shadow:0 4px 14px rgba(79,70,229,.35)}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+  .btn-ghost{background:#fff;border:1.5px solid var(--border);color:var(--muted)}
+  .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+  .mode-tag{font-size:12px;color:var(--muted)}
+
+  /* 分类结果 */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .cat-card{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fafbff}
+  .cat-card h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .cat-card ul{list-style:none}
+  .cat-card li{font-size:13px;color:#374151;padding:7px 0;border-top:1px dashed var(--border)}
+  .cat-card li:first-child{border-top:none}
+  .cat-empty{color:#9ca3af;font-size:13px}
+
+  /* 对照视图 */
+  .pair{display:grid;grid-template-columns:1fr 40px 1fr;gap:10px;align-items:stretch;margin-bottom:12px}
+  .pair .raw,.pair .refined{border-radius:10px;padding:12px 14px;font-size:13px}
+  .pair .raw{background:#f3f4f6;color:#6b7280;border:1px dashed #d1d5db}
+  .pair .refined{background:linear-gradient(135deg,#eef2ff,#f5f3ff);border:1px solid #c7d2fe;color:#312e81;font-weight:500}
+  .pair .arrow{display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:20px;font-weight:700}
+  .pair .cat-label{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;margin-bottom:6px;color:#fff}
+
+  /* 下周计划 */
+  .plan-item{border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#fff}
+  .plan-item input.task{width:100%;border:none;font-size:15px;font-weight:600;color:var(--text);outline:none;background:transparent;font-family:inherit}
+  .plan-item textarea.goal{min-height:38px;margin-top:6px;font-size:13px;color:var(--green);border:1px solid transparent;padding:6px 8px;border-radius:6px}
+  .plan-item textarea.goal:focus{border-color:var(--border)}
+  .plan-item textarea.actions{min-height:56px;margin-top:4px;font-size:13px;color:#4b5563;border:1px solid transparent;padding:6px 8px;border-radius:6px}
+  .plan-item textarea.actions:focus{border-color:var(--border)}
+  .plan-label{font-size:11px;color:var(--muted);margin-top:8px;display:block}
+  .plan-del{float:right;color:#d1d5db;background:none;padding:0 6px;font-size:16px}
+  .plan-del:hover{color:var(--rose)}
+
+  .summary-bar{background:linear-gradient(100deg,#ecfdf5,#f0fdfa);border:1px solid #a7f3d0;color:#065f46;border-radius:10px;padding:12px 16px;font-size:14px;margin-bottom:16px;font-weight:500}
+
+  .hidden{display:none}
+  .loading{display:inline-flex;align-items:center;gap:10px;color:var(--primary);font-size:14px}
+  .spinner{width:18px;height:18px;border:3px solid var(--primary-light);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* 三状态指示条（净化前 / 净化中 / 净化后 / 异常） */
+  .status-pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;padding:8px 15px;border-radius:99px;border:1px solid var(--border);background:#f9fafb;color:var(--muted);line-height:1.4}
+  .status-pill .sub{font-size:11px;opacity:.85}
+  .status-pill.idle{color:#6b7280}
+  .status-pill.loading{color:var(--primary);background:var(--primary-light);border-color:#c7d2fe}
+  .status-pill.loading .spinner{width:15px;height:15px;border-width:2.5px}
+  .status-pill.done{color:#065f46;background:#ecfdf5;border-color:#a7f3d0;font-weight:500}
+  .status-pill.error{color:#92400e;background:#fffbeb;border-color:#fcd34d;font-weight:500}
+
+  footer{text-align:center;color:#9ca3af;font-size:12px;margin-top:30px}
+
+  /* Toast 轻提示 */
+  .toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none}
+  .toast{padding:11px 22px;border-radius:11px;font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,.2);animation:toastIn .25s ease;max-width:90vw;text-align:center}
+  .toast.info{background:#1f2937;color:#fff}
+  .toast.ok{background:#059669;color:#fff}
+  .toast.warn{background:#d97706;color:#fff}
+  .toast.err{background:#e11d48;color:#fff}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .toast.fade{opacity:0;transition:opacity .3s}
+
+  /* 密钥设置 */
+  .key-btn{position:absolute;top:18px;right:20px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:13px;padding:7px 16px;border-radius:99px;z-index:2;cursor:pointer}
+  .key-btn:hover{background:rgba(255,255,255,.28)}
+  .modal-mask{position:fixed;inset:0;background:rgba(17,24,39,.5);display:flex;align-items:center;justify-content:center;z-index:100}
+  .modal-mask.hidden{display:none}
+  .modal{background:#fff;border-radius:14px;width:min(480px,92vw);padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .modal h3{font-size:17px;margin-bottom:6px}
+  .modal .tip{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+  .modal .tip a{color:var(--primary)}
+  .modal input.key-input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:11px 13px;font-size:13px;font-family:Consolas,monospace;outline:none}
+  .modal input.key-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+  .modal .key-status{font-size:12px;margin-top:8px;min-height:18px}
+  .warn-bar{background:#fffbeb;border:1px solid #fcd34d;color:#92400e;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:14px}
+
+  @media(max-width:640px){.pair{grid-template-columns:1fr}.pair .arrow{transform:rotate(90deg);padding:2px 0}}
+  @media print{
+    body{background:#fff}
+    header{background:#4f46e5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    #inputCard,.btn-row,#exportBar,.plan-del,footer{display:none!important}
+    .card{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="container" id="reportRoot">
+
+  <header>
+    <button class="key-btn" onclick="openKeyModal()" id="keyBtn">🔑 密钥设置</button>
+    <h1>🧪 周报"注水"净化器</h1>
+    <p>把「发了5篇推文改了3次标题」的流水账，一键升华为「通过A/B测试策略提升点击率」的价值叙事</p>
+    <span class="badge" id="modeBadge">运营人 2 小时的活儿，30 秒搞定</span>
+  </header>
+
+  <!-- 密钥设置弹窗 -->
+  <div class="modal-mask hidden" id="keyModal" onclick="if(event.target===this)closeKeyModal()">
+    <div class="modal">
+      <h3>🔑 密钥设置（访客自带 Key）</h3>
+      <p class="tip">
+        填入你自己的魔搭 API Key（<a href="https://www.modelscope.cn/my/myaccesstoken" target="_blank" rel="noopener">点此获取，免费</a>），即可启用大模型净化。<br>
+        🔒 密钥 / 模型 / 地址<b>均仅保存在你本地浏览器</b>，不会上传或存储到服务端，仅在净化或自检请求时透传给魔搭官方接口。即使本空间未配置环境变量，也能真实使用。
+      </p>
+
+      <label style="font-size:12.5px;color:var(--muted);display:block;margin-bottom:5px">魔搭 API Key</label>
+      <input class="key-input" id="keyInput" type="password" placeholder="ms-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off">
+
+      <label style="font-size:12.5px;color:var(--muted);display:block;margin:14px 0 5px">模型名（可选）</label>
+      <input class="key-input" id="modelInput" placeholder="Qwen/Qwen3-30B-A3B-Instruct-2507" autocomplete="off">
+
+      <label style="font-size:12.5px;color:var(--muted);display:block;margin:14px 0 5px">接口地址 Base URL（可选）</label>
+      <input class="key-input" id="baseInput" placeholder="https://api-inference.modelscope.cn/v1" autocomplete="off">
+
+      <div class="key-status" id="keyStatus"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveKey()">保存</button>
+        <button class="btn-ghost" id="testBtn" onclick="testConnection()">🔌 连接自检</button>
+        <button class="btn-ghost" onclick="clearKey()">清除</button>
+        <button class="btn-ghost" onclick="closeKeyModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 输入区 -->
+  <div class="card" id="inputCard">
+    <h2><span class="num">1</span>丢进你的碎碎念（支持语音转文字的口水话）</h2>
+    <textarea id="inputText" placeholder="例：周一发了5篇推文，改了3次标题才定稿。然后拉了个新用户群，进了80多人。周三搞了个签到打卡活动，群里挺活跃的。还做了个9.9元体验课的促销，卖了40多单。视频脚本还没写完，下周得做直播预热……"></textarea>
+    <div class="btn-row">
+      <button class="btn-primary" id="purifyBtn" onclick="purify()">⚡ 一键净化</button>
+      <button class="btn-ghost" onclick="fillExample()">填入示例</button>
+      <button class="btn-ghost" onclick="clearAll()">清空</button>
+      <span class="status-pill idle" id="statusPill">● 待净化 · 输入碎碎念后点「一键净化」</span>
+    </div>
+  </div>
+
+  <!-- 结果区 -->
+  <div id="resultArea" class="hidden">
+
+    <div class="warn-bar hidden" id="aiErrorBar"></div>
+    <div class="summary-bar" id="summaryBar"></div>
+
+    <div class="card">
+      <h2><span class="num">2</span>碎碎念结构化 · 四大维度分类</h2>
+      <div class="grid" id="catGrid"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">3</span>价值升华引擎 · 原始描述 → 价值叙事</h2>
+      <div id="pairList"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="num">4</span>下周计划草稿（可直接编辑）</h2>
+      <div id="planList"></div>
+      <button class="btn-ghost" onclick="addPlan()">＋ 新增一条计划</button>
+    </div>
+
+    <div class="card" id="exportBar">
+      <h2><span class="num">5</span>导出周报</h2>
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn-primary" onclick="exportMarkdown()">📄 导出 Markdown</button>
+        <button class="btn-primary" style="background:linear-gradient(100deg,#059669,#0d9488);box-shadow:0 4px 14px rgba(5,150,105,.3)" onclick="exportPDF()">🖨 导出 PDF</button>
+        <span class="mode-tag">PDF 通过浏览器打印面板生成，选择「另存为 PDF」即可</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>周报"注水"净化器 · 从流水账到价值叙事 · 仅供提效，请确保叙事与事实相符 😉</footer>
+</div>
+
+<script>
+const CAT_COLORS = {"用户增长":"#e11d48","留存":"#d97706","转化":"#059669","内容":"#0284c7"};
+const CATS = ["用户增长","留存","转化","内容"];
+let currentData = null;
+
+const EXAMPLE = `周一发了5篇推文，改了3次标题才定稿，有一篇阅读还行。
+周二在小红书和知乎发了引流笔记，加了60多个好友，拉了个新用户群进了80多人。
+周三搞了个群签到打卡活动，发了点小红包，群里挺活跃的，回答了一堆用户问题。
+周四做了个9.9元体验课促销，发朋友圈+群里推，卖了40多单。
+周五剪了2条短视频发抖音，还写直播脚本，没写完。
+另外老用户回访打了30个电话，有几个说要续费。
+下周得做直播预热，还要把会员体系的方案弄出来。`;
+
+function fillExample(){ document.getElementById('inputText').value = EXAMPLE; }
+function clearAll(){
+  document.getElementById('inputText').value='';
+  document.getElementById('resultArea').classList.add('hidden');
+  currentData=null;
+  setState('idle');   // 状态①：回到待净化
+}
+
+/* 三状态机：idle（净化前）/ loading（净化中）/ done（净化后）/ error（异常） */
+function setState(state, text){
+  const pill = document.getElementById('statusPill');
+  const btn = document.getElementById('purifyBtn');
+  pill.className = 'status-pill ' + state;
+  if(state==='idle'){
+    pill.innerHTML = '● 待净化 · 输入碎碎念后点「一键净化」';
+    btn.disabled = false;
+  }else if(state==='loading'){
+    pill.innerHTML = '<span class="spinner"></span> AI 正在净化注水、提炼价值…<br><span class="sub">AI 模式预计需 10~60 秒，请稍候</span>';
+    btn.disabled = true;
+  }else if(state==='done'){
+    pill.innerHTML = text || '✅ 净化完成';
+    btn.disabled = false;
+  }else if(state==='error'){
+    pill.innerHTML = text || '⚠️ 净化异常';
+    btn.disabled = false;
+  }
+}
+
+async function purify(){
+  const text = document.getElementById('inputText').value.trim();
+  if(text.length < 10){ toast('请至少输入10个字的工作记录～'); return; }
+  setState('loading');   // 状态②：净化中
+
+  // 前端超时保护：120 秒后主动中断 fetch
+  const controller = new AbortController();
+  const fetchTimer = setTimeout(()=>controller.abort(), 120000);
+  // 硬兜底：与 fetch 完全无关的独立定时器，到时强制收尾，保证永不卡死
+  let forceEnded = false;
+  const hardTimer = setTimeout(()=>{
+    forceEnded = true;
+    setState('error', '⚠️ 净化等待过久（超过150秒），已强制结束');   // 状态兜底
+    toast('净化等待过久（超过150秒），已强制结束。请稍后重试，或清除密钥先用本地规则引擎。', 'err');
+  }, 150000);
+
+  try{
+    const res = await fetch('/api/purify',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text, api_key: getKey(), model: getModel(), base_url: getBaseUrl()}),
+      signal: controller.signal
+    });
+    const data = await res.json();
+    if(forceEnded) return;   // 已被硬兜底强制结束，丢弃迟到结果
+    if(!res.ok) throw new Error(data.error || '服务异常（HTTP '+res.status+'）');
+    currentData = data;
+    render(data);
+    // 状态③：净化后
+    if(data.mode==='ai'){
+      setState('done', data.key_source==='visitor' ? '✅ 净化完成 · AI 大模型净化（使用你的密钥）' : '✅ 净化完成 · AI 大模型净化');
+    }else{
+      setState('done', '✅ 净化完成 · 本地规则引擎');
+    }
+  }catch(e){
+    if(forceEnded) return;   // 已被硬兜底处理，避免重复提示
+    if(e.name==='AbortError'){
+      setState('error', '⚠️ 净化超时（超过120秒）');
+      toast('净化超时（超过120秒），已中断。请稍后重试，或清除密钥先用本地规则引擎。', 'err');
+    }else{
+      setState('error', '⚠️ 净化失败：' + e.message);
+      toast('净化失败：' + e.message, 'err');
+    }
+  }finally{
+    clearTimeout(fetchTimer);
+    clearTimeout(hardTimer);
+    // 注意：成功/失败分支已显式设置 done / error 状态，无需再兜底
+  }
+}
+
+function render(data){
+  document.getElementById('resultArea').classList.remove('hidden');
+  const errBar = document.getElementById('aiErrorBar');
+  if(data.ai_error){
+    errBar.textContent = '⚠️ ' + data.ai_error + '（已自动切换为本地规则引擎完成本次净化）';
+    errBar.classList.remove('hidden');
+  }else{
+    errBar.classList.add('hidden');
+  }
+  document.getElementById('summaryBar').textContent = '📌 管理者速览：' + (data.summary || '本周工作有序推进。');
+
+  // 分类
+  const grid = document.getElementById('catGrid'); grid.innerHTML='';
+  CATS.forEach(cat=>{
+    const items = data.items.filter(i=>i.category===cat);
+    const div = document.createElement('div'); div.className='cat-card';
+    div.innerHTML = `<h3><span class="dot" style="background:${CAT_COLORS[cat]}"></span>${cat}
+      <span style="color:#9ca3af;font-weight:400;font-size:12px">(${items.length})</span></h3>
+      <ul>${items.length ? items.map(i=>`<li>${esc(i.refined)}</li>`).join('') : '<li class="cat-empty">本周暂无该维度动作</li>'}</ul>`;
+    grid.appendChild(div);
+  });
+
+  // 对照
+  const pairList = document.getElementById('pairList'); pairList.innerHTML='';
+  data.items.forEach(i=>{
+    const d = document.createElement('div'); d.className='pair';
+    d.innerHTML = `
+      <div class="raw"><span class="cat-label" style="background:${CAT_COLORS[i.category]}">${i.category}</span><br>${esc(i.raw)}</div>
+      <div class="arrow">➜</div>
+      <div class="refined">${esc(i.refined)}</div>`;
+    pairList.appendChild(d);
+  });
+
+  // 计划
+  const planList = document.getElementById('planList'); planList.innerHTML='';
+  (data.next_week||[]).forEach(p=>appendPlan(p));
+}
+
+function appendPlan(p){
+  const d = document.createElement('div'); d.className='plan-item';
+  d.innerHTML = `
+    <button class="plan-del" title="删除" onclick="this.parentNode.remove()">×</button>
+    <input class="task" value="${escAttr(p.task||'')}" placeholder="任务名">
+    <span class="plan-label">🎯 预期目标</span>
+    <textarea class="goal">${esc(p.goal||'')}</textarea>
+    <span class="plan-label">🔑 关键动作（每行一条）</span>
+    <textarea class="actions">${esc((p.actions||[]).join('\n'))}</textarea>`;
+  document.getElementById('planList').appendChild(d);
+}
+function addPlan(){ appendPlan({task:'',goal:'',actions:[]}); }
+
+function collectPlans(){
+  return [...document.querySelectorAll('.plan-item')].map(el=>({
+    task: el.querySelector('.task').value.trim(),
+    goal: el.querySelector('.goal').value.trim(),
+    actions: el.querySelector('.actions').value.split('\n').map(s=>s.trim()).filter(Boolean)
+  })).filter(p=>p.task);
+}
+
+function buildMarkdown(){
+  const d = currentData; if(!d) return '';
+  const today = new Date();
+  let md = `# 运营周报（${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}）\n\n`;
+  md += `> ${d.summary||''}\n\n## 一、本周工作（按维度）\n\n`;
+  CATS.forEach(cat=>{
+    const items = d.items.filter(i=>i.category===cat);
+    if(!items.length) return;
+    md += `### ${cat}\n\n`;
+    items.forEach(i=>{ md += `- ${i.refined}\n`; });
+    md += '\n';
+  });
+  md += `## 二、价值升华对照\n\n| 维度 | 原始描述 | 价值叙事 |\n|---|---|---|\n`;
+  d.items.forEach(i=>{ md += `| ${i.category} | ${i.raw.replace(/\|/g,'/')} | ${i.refined.replace(/\|/g,'/')} |\n`; });
+  md += `\n## 三、下周计划\n\n`;
+  collectPlans().forEach((p,idx)=>{
+    md += `### ${idx+1}. ${p.task}\n\n- **预期目标**：${p.goal}\n`;
+    p.actions.forEach(a=>{ md += `- 关键动作：${a}\n`; });
+    md += '\n';
+  });
+  return md;
+}
+
+function exportMarkdown(){
+  if(!currentData){ toast('请先执行一键净化'); return; }
+  const blob = new Blob([buildMarkdown()], {type:'text/markdown;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '运营周报.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportPDF(){
+  if(!currentData){ toast('请先执行一键净化'); return; }
+  window.print();
+}
+
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return esc(s).replace(/"/g,'&quot;'); }
+
+/* ============ Toast 轻提示 ============ */
+function toast(msg, type='info', ms=2800){
+  let wrap = document.getElementById('toastWrap');
+  if(!wrap){ wrap = document.createElement('div'); wrap.className='toast-wrap'; wrap.id='toastWrap'; document.body.appendChild(wrap); }
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(()=>{ t.classList.add('fade'); setTimeout(()=>t.remove(), 320); }, ms);
+}
+
+/* ============ 密钥设置（仅存本地浏览器，不上传） ============ */
+const LS_KEY='ms_api_key', LS_MODEL='ms_model', LS_BASE='ms_base_url';
+const DEFAULT_MODEL='Qwen/Qwen3-30B-A3B-Instruct-2507';
+const DEFAULT_BASE='https://api-inference.modelscope.cn/v1';
+function lsGet(k){ try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } }
+function lsSet(k,v){ try{ localStorage.setItem(k, v); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+function getKey(){ return lsGet(LS_KEY); }
+function getModel(){ return lsGet(LS_MODEL); }
+function getBaseUrl(){ return lsGet(LS_BASE); }
+function openKeyModal(){
+  document.getElementById('keyModal').classList.remove('hidden');
+  document.getElementById('keyInput').value = getKey();
+  document.getElementById('modelInput').value = getModel();
+  document.getElementById('baseInput').value = getBaseUrl();
+  updateKeyStatus();
+}
+function closeKeyModal(){ document.getElementById('keyModal').classList.add('hidden'); }
+function saveKey(){
+  const k = document.getElementById('keyInput').value.trim();
+  if(!k){ toast('密钥为空，若要移除请点「清除」', 'warn'); return; }
+  lsSet(LS_KEY, k);
+  lsSet(LS_MODEL, document.getElementById('modelInput').value.trim());
+  lsSet(LS_BASE, document.getElementById('baseInput').value.trim());
+  updateKeyStatus(); refreshKeyBtn();
+  document.getElementById('modeBadge').textContent = '🤖 将使用你的本地密钥调用大模型';
+  toast('已保存密钥（仅存于本浏览器）', 'ok');
+  closeKeyModal();
+}
+function clearKey(){
+  lsDel(LS_KEY); lsDel(LS_MODEL); lsDel(LS_BASE);
+  document.getElementById('keyInput').value='';
+  document.getElementById('modelInput').value='';
+  document.getElementById('baseInput').value='';
+  updateKeyStatus(); refreshKeyBtn();
+  document.getElementById('modeBadge').textContent = '运营人 2 小时的活儿，30 秒搞定';
+  toast('已清除全部密钥设置', 'info');
+}
+async function testConnection(){
+  const k = document.getElementById('keyInput').value.trim();
+  if(!k){ toast('请先填写 API Key 再自检', 'warn'); return; }
+  const btn = document.getElementById('testBtn');
+  btn.disabled = true; btn.textContent = '🔄 自检中…';
+  try{
+    const res = await fetch('/api/check',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        api_key: k,
+        model: document.getElementById('modelInput').value.trim(),
+        base_url: document.getElementById('baseInput').value.trim()
+      })
+    });
+    const d = await res.json();
+    if(d.ok){
+      document.getElementById('keyStatus').textContent = '✅ 连接成功！模型：' + d.model;
+      document.getElementById('keyStatus').style.color = '#059669';
+      toast('连接自检通过 ✅', 'ok');
+    }else{
+      document.getElementById('keyStatus').textContent = '❌ ' + (d.error || '连接失败');
+      document.getElementById('keyStatus').style.color = '#e11d48';
+      toast('连接失败：' + (d.error||''), 'err');
+    }
+  }catch(e){
+    document.getElementById('keyStatus').textContent = '❌ 自检请求异常：' + e.message;
+    document.getElementById('keyStatus').style.color = '#e11d48';
+    toast('自检请求异常：' + e.message, 'err');
+  }finally{
+    btn.disabled = false; btn.textContent = '🔌 连接自检';
+  }
+}
+function updateKeyStatus(){
+  const st = document.getElementById('keyStatus');
+  if(getKey()){
+    st.textContent = '✅ 已保存密钥（仅存于本浏览器），净化时将使用你的密钥调用大模型';
+    st.style.color = '#059669';
+  }else{
+    st.textContent = '尚未设置密钥，将使用空间环境变量密钥或本地规则引擎';
+    st.style.color = '#9ca3af';
+  }
+}
+function refreshKeyBtn(){
+  document.getElementById('keyBtn').textContent = getKey() ? '🔑 密钥已设置 ✓' : '🔑 密钥设置';
+}
+refreshKeyBtn();
+setState('idle');   // 状态①：初始化为待净化
+// 初始化 badge：若本地已存密钥，直接显示"将使用本地密钥"
+if(getKey()) document.getElementById('modeBadge').textContent = '🤖 将使用你的本地密钥调用大模型';
+
+// 启动时探测后端模式（仅当本地无密钥时，才按空间是否启用 AI 更新 badge）
+fetch('/api/health').then(r=>r.json()).then(d=>{
+  if(!getKey() && d.ai_enabled) document.getElementById('modeBadge').textContent = '🤖 空间已接入大模型：' + d.model;
+}).catch(()=>{});
+</script>
+</body>
+</html>
